@@ -1,4 +1,73 @@
 services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tournament-gateway
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+      tournament-service:
+        condition: service_started
+    environment:
+      PORT: ${GATEWAY_PORT:-3000}
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: gateway
+      KAFKA_CONSUMER_GROUP_ID: gateway-consumer
+      KAFKAJS_NO_PARTITIONER_WARNING: '1'
+    command: ['node', 'dist/apps/gateway/gateway/src/main.js']
+    ports:
+      - '${GATEWAY_PORT:-3000}:3000'
+    networks:
+      - tournament_net
+
+  tournament-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tournament-service
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+      user-service:
+        condition: service_started
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_CLIENT_ID: tournament-service
+      KAFKA_CONSUMER_GROUP_ID: tournament-service-consumer
+      KAFKAJS_NO_PARTITIONER_WARNING: '1'
+      NATS_SERVERS: nats://nats:4222
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-tournament_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_SYNCHRONIZE: ${POSTGRES_SYNCHRONIZE:-true}
+    command: ['node', 'dist/apps/tournament-service/tournament-service/src/main.js']
+    networks:
+      - tournament_net
+
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    depends_on:
+      nats:
+        condition: service_started
+    environment:
+      NATS_SERVERS: nats://nats:4222
+    command: ['node', 'dist/apps/user-service/user-service/src/main.js']
+    networks:
+      - tournament_net
+
   postgres:
     image: postgres:16-alpine
     container_name: tournament-postgres

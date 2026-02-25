@@ -10,7 +10,7 @@
     "user-service": {
       "type": "application",
       "root": "apps/user-service",
-      "entryFile": "src/main",
+      "entryFile": "user-service/src/main",
       "sourceRoot": "apps/user-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/user-service/tsconfig.app.json"

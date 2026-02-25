@@ -6,33 +6,29 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "npm run build:gateway && npm run build:user-service && npm run build:tournament-service",
     "build:gateway": "nest build gateway",
     "build:user-service": "nest build user-service",
     "infra:up": "docker compose up -d postgres nats kafka",
     "infra:down": "docker compose down",
     "infra:logs": "docker compose logs -f",
     "build:tournament-service": "nest build tournament-service",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "format": "prettier --write \"apps/**/*.ts\" \"README.md\"",
+    "start": "npm run start:gateway",
     "start:gateway": "nest start gateway",
     "start:gateway:dev": "nest start gateway --watch",
     "start:user-service": "nest start user-service",
     "start:user-service:dev": "nest start user-service --watch",
     "start:tournament-service": "nest start tournament-service",
     "start:tournament-service:dev": "nest start tournament-service --watch",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "start:dev": "npm run start:gateway:dev",
+    "start:debug": "nest start gateway --debug --watch",
+    "start:prod": "node dist/apps/gateway/gateway/src/main.js",
+    "lint": "eslint \"apps/**/*.ts\" --fix",
+    "test": "npm run test:gateway && npm run test:tournament-service && npm run test:user-service",
     "test:gateway": "jest --config ./apps/gateway/test/jest.config.json",
     "test:tournament-service": "jest --config ./apps/tournament-service/test/jest.config.json",
-    "test:user-service": "jest --config ./apps/user-service/test/jest.config.json",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:user-service": "jest --config ./apps/user-service/test/jest.config.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -73,22 +69,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }
