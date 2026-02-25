@@ -7,8 +7,11 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:user-service": "nest build user-service",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "start:user-service": "nest start user-service",
+    "start:user-service:dev": "nest start user-service --watch",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -24,6 +27,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.1.14",
     "@nestjs/platform-express": "^11.0.1",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

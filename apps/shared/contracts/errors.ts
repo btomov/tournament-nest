@@ -16,20 +16,20 @@ export const ServiceErrorCodes = {
 export type ServiceErrorCode =
   (typeof ServiceErrorCodes)[keyof typeof ServiceErrorCodes];
 
-export interface ServiceError {
+export type ServiceError = {
   code: ServiceErrorCode;
   message: string;
   details?: Record<string, unknown>;
-}
+};
 
-export interface ServiceSuccess<T> {
+export type ServiceSuccess<T> = {
   ok: true;
   data: T;
-}
+};
 
-export interface ServiceFailure {
+export type ServiceFailure = {
   ok: false;
   error: ServiceError;
-}
+};
 
 export type ServiceResult<T> = ServiceSuccess<T> | ServiceFailure;

@@ -1,8 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
-import { NatsPatterns } from 'apps/shared/contracts/messaging';
-import { UserLookupRequest, UserLookupResponse } from '@app/contracts';
+import {
+  NatsPatterns,
+  type UserLookupRequest,
+  type UserLookupResponse,
+} from '@app/contracts';
 
 @Controller()
 export class UserController {

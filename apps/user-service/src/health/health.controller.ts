@@ -6,8 +6,8 @@ export class HealthController {
   getHealth(): { status: string; service: string; time: string } {
     return {
       status: 'ok',
-      service: 'gateway',
-      time: new Date().toISOString()
+      service: 'user-service',
+      time: new Date().toISOString(),
     };
   }
 }

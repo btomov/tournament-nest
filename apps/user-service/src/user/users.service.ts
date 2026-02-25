@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserProfile } from 'shared/contracts/src';
+import { type UserProfile } from '@app/contracts';
 
 @Injectable()
 export class UsersService {
@@ -7,7 +7,7 @@ export class UsersService {
     { id: 'user1', username: 'alice', displayName: 'Alice' },
     { id: 'user2', username: 'bob', displayName: 'Bob' },
     { id: 'user3', username: 'carol', displayName: 'Carol' },
-    { id: 'user4', username: 'dan', displayName: 'Dan' }
+    { id: 'user4', username: 'dan', displayName: 'Dan' },
   ];
 
   findById(playerId: string): UserProfile | null {
