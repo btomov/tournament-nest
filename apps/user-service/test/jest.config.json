@@ -1,0 +1,17 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "../../..",
+  "testRegex": "apps/user-service/src/.*\\.spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@app/contracts$": "<rootDir>/apps/shared/contracts/index.ts",
+    "^@app/contracts/(.*)$": "<rootDir>/apps/shared/contracts/$1",
+    "^@app/config$": "<rootDir>/apps/shared/config/index.ts",
+    "^@app/config/(.*)$": "<rootDir>/apps/shared/config/$1"
+  },
+  "collectCoverageFrom": ["apps/user-service/src/**/*.ts"],
+  "coverageDirectory": "coverage/user-service",
+  "testEnvironment": "node"
+}

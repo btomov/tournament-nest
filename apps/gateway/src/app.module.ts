@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { getKafkaBrokers } from '@app/config/messaging.config';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { HealthController } from './health/health.controller';
 import { TournamentsController } from './tournaments/tournaments.controller';
 import {
@@ -10,6 +14,12 @@ import {
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: (process.env.JWT_EXPIRES_IN ?? '1h') as never,
+      },
+    }),
     ClientsModule.register([
       {
         name: TOURNAMENT_KAFKA_CLIENT,
@@ -27,7 +37,7 @@ import {
       },
     ]),
   ],
-  controllers: [HealthController, TournamentsController],
-  providers: [TournamentsService],
+  controllers: [AuthController, HealthController, TournamentsController],
+  providers: [AuthService, JwtAuthGuard, TournamentsService],
 })
 export class AppModule {}

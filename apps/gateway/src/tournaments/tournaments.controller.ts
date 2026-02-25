@@ -5,11 +5,16 @@ import {
   Headers,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   type GetPlayerTournamentsResult,
+  type JoinTournamentCommandData,
   type JoinTournamentResult,
 } from '@app/contracts';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { type JwtUser } from '../auth/auth.types';
 import {
   JoinTournamentHttpRequestDto,
   PlayerTournamentsParamsDto,
@@ -21,11 +26,29 @@ export class TournamentsController {
   constructor(private readonly tournamentsService: TournamentsService) {}
 
   @Post('tournaments/join')
+  @UseGuards(JwtAuthGuard)
   joinTournament(
     @Body() body: JoinTournamentHttpRequestDto,
+    @CurrentUser() user: JwtUser,
     @Headers('x-correlation-id') correlationId?: string,
   ): Promise<JoinTournamentResult> {
-    return this.tournamentsService.joinTournament(body, correlationId);
+    const command: JoinTournamentCommandData = {
+      playerId: user.sub,
+      gameType: body.gameType,
+      tournamentType: body.tournamentType,
+      entryFee: body.entryFee,
+    };
+
+    return this.tournamentsService.joinTournament(command, correlationId);
+  }
+
+  @Get('tournaments/my-tournaments')
+  @UseGuards(JwtAuthGuard)
+  getMyTournaments(
+    @CurrentUser() user: JwtUser,
+    @Headers('x-correlation-id') correlationId?: string,
+  ): Promise<GetPlayerTournamentsResult> {
+    return this.tournamentsService.getPlayerTournaments(user.sub, correlationId);
   }
 
   @Get('players/:playerId/tournaments')

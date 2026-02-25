@@ -3,10 +3,6 @@ import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 export class JoinTournamentHttpRequestDto {
   @IsString()
   @IsNotEmpty()
-  playerId!: string;
-
-  @IsString()
-  @IsNotEmpty()
   gameType!: string;
 
   @IsString()

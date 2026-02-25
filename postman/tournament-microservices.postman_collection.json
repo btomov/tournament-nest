@@ -2,32 +2,84 @@
   "info": {
     "_postman_id": "4d4f16df-0f78-4b6d-b44e-cb40d0e9b302",
     "name": "Tournament Microservices Gateway",
-    "description": "Gateway requests for the tournament interview task (HTTP -> Kafka -> tournament-service -> NATS -> user-service).",
+    "description": "Gateway requests for the tournament interview task (HTTP -> Kafka -> tournament-service -> NATS -> user-service). Includes JWT bonus flow.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3000"
-    },
-    {
-      "key": "playerId",
-      "value": "user1"
-    },
-    {
-      "key": "gameType",
-      "value": "chess"
-    },
-    {
-      "key": "tournamentType",
-      "value": "solo"
-    },
-    {
-      "key": "entryFee",
-      "value": "10"
-    }
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "playerId", "value": "user1" },
+    { "key": "gameType", "value": "chess" },
+    { "key": "tournamentType", "value": "solo" },
+    { "key": "entryFee", "value": "10" },
+    { "key": "accessToken", "value": "" },
+    { "key": "missingUserToken", "value": "" }
   ],
   "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Login (user1) -> Save accessToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"{{playerId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "POST Login (missing-user) -> Save missingUserToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) pm.collectionVariables.set('missingUserToken', json.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"missing-user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "Health",
       "item": [
@@ -38,12 +90,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
             }
           }
         }
@@ -53,55 +101,51 @@
       "name": "Tournaments",
       "item": [
         {
-          "name": "POST Join Tournament (Success)",
+          "name": "POST Join Tournament (Success, JWT)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "postman-join-1"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "x-correlation-id", "value": "postman-join-1" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"playerId\": \"{{playerId}}\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+              "raw": "{\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tournaments/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tournaments",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "join"]
             }
           }
         },
         {
-          "name": "GET Player Tournaments (Success)",
+          "name": "GET My Tournaments (Success, JWT)",
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "x-correlation-id",
-                "value": "postman-query-1"
-              }
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "x-correlation-id", "value": "postman-query-1" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/my-tournaments",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "my-tournaments"]
+            }
+          }
+        },
+        {
+          "name": "GET Player Tournaments (Legacy route)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "x-correlation-id", "value": "postman-query-legacy" }
             ],
             "url": {
               "raw": "{{baseUrl}}/players/{{playerId}}/tournaments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "players",
-                "{{playerId}}",
-                "tournaments"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["players", "{{playerId}}", "tournaments"]
             }
           }
         },
@@ -110,24 +154,17 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"playerId\": \"{{playerId}}\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+              "raw": "{\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tournaments/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tournaments",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "join"]
             }
           }
         },
@@ -136,28 +173,18 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "x-correlation-id",
-                "value": "postman-join-missing-user"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{missingUserToken}}" },
+              { "key": "x-correlation-id", "value": "postman-join-missing-user" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"playerId\": \"missing-user\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+              "raw": "{\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tournaments/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tournaments",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "join"]
             }
           }
         },
@@ -166,24 +193,35 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"playerId\": \"\",\n  \"gameType\": \"chess\",\n  \"tournamentType\": \"solo\",\n  \"entryFee\": -5\n}"
+              "raw": "{\n  \"gameType\": \"chess\",\n  \"tournamentType\": \"solo\",\n  \"entryFee\": -5\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tournaments/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tournaments",
-                "join"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "join"]
+            }
+          }
+        },
+        {
+          "name": "POST Join Tournament (Missing JWT -> Unauthorized)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/join",
+              "host": ["{{baseUrl}}"],
+              "path": ["tournaments", "join"]
             }
           }
         }

@@ -23,7 +23,6 @@ describe('TournamentsController', () => {
 
   it('delegates POST /tournaments/join to TournamentsService', async () => {
     const body = {
-      playerId: 'user1',
       gameType: 'chess',
       tournamentType: 'solo',
       entryFee: 10,
@@ -52,12 +51,37 @@ describe('TournamentsController', () => {
 
     const result = await controller.joinTournament(
       body as never,
+      { sub: 'user1' } as never,
       'corr-http-1',
     );
 
     expect(tournamentsService.joinTournament).toHaveBeenCalledWith(
-      body,
+      {
+        playerId: 'user1',
+        gameType: 'chess',
+        tournamentType: 'solo',
+        entryFee: 10,
+      },
       'corr-http-1',
+    );
+    expect(result).toBe(expected);
+  });
+
+  it('delegates GET /tournaments/my-tournaments to TournamentsService', async () => {
+    const expected = {
+      playerId: 'user2',
+      tournaments: [],
+    };
+    tournamentsService.getPlayerTournaments.mockResolvedValue(expected);
+
+    const result = await controller.getMyTournaments(
+      { sub: 'user2' } as never,
+      'corr-http-3',
+    );
+
+    expect(tournamentsService.getPlayerTournaments).toHaveBeenCalledWith(
+      'user2',
+      'corr-http-3',
     );
     expect(result).toBe(expected);
   });
