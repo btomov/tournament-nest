@@ -10,10 +10,19 @@
     "user-service": {
       "type": "application",
       "root": "apps/user-service",
-      "entryFile": "main",
+      "entryFile": "src/main",
       "sourceRoot": "apps/user-service/src",
       "compilerOptions": {
         "tsConfigPath": "apps/user-service/tsconfig.app.json"
+      }
+    },
+    "tournament-service": {
+      "type": "application",
+      "root": "apps/tournament-service",
+      "entryFile": "tournament-service/src/main",
+      "sourceRoot": "apps/tournament-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tournament-service/tsconfig.app.json"
       }
     }
   }

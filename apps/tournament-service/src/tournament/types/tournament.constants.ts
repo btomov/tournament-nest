@@ -1,0 +1,5 @@
+export const USER_SERVICE_NATS_CLIENT = 'USER_SERVICE_NATS_CLIENT';
+
+export const TOURNAMENT_SERVICE_SOURCE = 'tournament-service';
+export const USER_LOOKUP_TIMEOUT_MS = 2_000;
+export const DEFAULT_TOURNAMENT_MAX_PLAYERS = 4;
