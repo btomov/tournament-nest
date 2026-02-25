@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { getKafkaBrokers } from '@app/config/messaging.config';
 import { AppModule } from './app.module';
-import { getKafkaBrokers } from './config/messaging.config';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(

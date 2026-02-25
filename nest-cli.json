@@ -24,6 +24,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/tournament-service/tsconfig.app.json"
       }
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "gateway/src/main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
     }
   }
 }
