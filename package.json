@@ -8,6 +8,9 @@
   "scripts": {
     "build": "nest build",
     "build:user-service": "nest build user-service",
+    "infra:up": "docker compose up -d postgres nats kafka",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:user-service": "nest start user-service",
