@@ -20,6 +20,13 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+
+    "paths": {
+      "@app/contracts": ["apps/shared/contracts"],
+      "@app/contracts/*": ["apps/shared/contracts/*"],
+      "@app/config": ["apps/shared/config"],
+      "@app/config/*": ["apps/shared/config/*"]
+    }
   }
 }
