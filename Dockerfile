@@ -13,6 +13,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
+COPY openapi ./openapi
 
 # Default command is overridden per service in docker-compose.yml.
 CMD ["node", "dist/apps/gateway/gateway/src/main.js"]

@@ -1,0 +1,420 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tournament Gateway API",
+    "description": "HTTP gateway for tournament operations (Kafka request/reply to tournament-service).",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health"
+    },
+    {
+      "name": "Tournaments"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Gateway health check",
+        "responses": {
+          "200": {
+            "description": "Gateway is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tournaments/join": {
+      "post": {
+        "tags": [
+          "Tournaments"
+        ],
+        "summary": "Join (or create and join) a tournament",
+        "parameters": [
+          {
+            "name": "x-correlation-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional correlation id for tracing"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinTournamentRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "playerId": "user1",
+                    "gameType": "chess",
+                    "tournamentType": "solo",
+                    "entryFee": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Player joined tournament",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JoinTournamentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict (already joined/full/etc.)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Tournament service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tournament service timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/players/{playerId}/tournaments": {
+      "get": {
+        "tags": [
+          "Tournaments"
+        ],
+        "summary": "Get tournaments for a player",
+        "parameters": [
+          {
+            "name": "playerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-correlation-id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional correlation id for tracing"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Player tournaments list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPlayerTournamentsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation or request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Tournament service unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Tournament service timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "time"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "service": {
+            "type": "string",
+            "example": "gateway"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JoinTournamentRequest": {
+        "type": "object",
+        "required": [
+          "playerId",
+          "gameType",
+          "tournamentType",
+          "entryFee"
+        ],
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "example": "user1"
+          },
+          "gameType": {
+            "type": "string",
+            "example": "chess"
+          },
+          "tournamentType": {
+            "type": "string",
+            "example": "solo"
+          },
+          "entryFee": {
+            "type": "number",
+            "minimum": 0,
+            "example": 10
+          }
+        }
+      },
+      "TournamentPlayerSummary": {
+        "type": "object",
+        "required": [
+          "playerId",
+          "username",
+          "displayName",
+          "joinedAt"
+        ],
+        "properties": {
+          "playerId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TournamentSummary": {
+        "type": "object",
+        "required": [
+          "tournamentId",
+          "gameType",
+          "tournamentType",
+          "entryFee",
+          "status",
+          "playersCount",
+          "maxPlayers",
+          "createdAt",
+          "updatedAt",
+          "players"
+        ],
+        "properties": {
+          "tournamentId": {
+            "type": "string"
+          },
+          "gameType": {
+            "type": "string"
+          },
+          "tournamentType": {
+            "type": "string"
+          },
+          "entryFee": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "full"
+            ]
+          },
+          "playersCount": {
+            "type": "integer"
+          },
+          "maxPlayers": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentPlayerSummary"
+            }
+          }
+        }
+      },
+      "JoinTournamentResponse": {
+        "type": "object",
+        "required": [
+          "tournament",
+          "joinedPlayer"
+        ],
+        "properties": {
+          "tournament": {
+            "$ref": "#/components/schemas/TournamentSummary"
+          },
+          "joinedPlayer": {
+            "$ref": "#/components/schemas/TournamentPlayerSummary"
+          }
+        }
+      },
+      "GetPlayerTournamentsResponse": {
+        "type": "object",
+        "required": [
+          "playerId",
+          "tournaments"
+        ],
+        "properties": {
+          "playerId": {
+            "type": "string",
+            "example": "user1"
+          },
+          "tournaments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TournamentSummary"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "code": {
+            "type": "string",
+            "example": "PLAYER_ALREADY_JOINED"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "correlationId": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "description": "Gateway validation errors and downstream service errors share a similar top-level shape but are not identical."
+      }
+    }
+  }
+}

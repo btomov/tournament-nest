@@ -1,0 +1,193 @@
+{
+  "info": {
+    "_postman_id": "4d4f16df-0f78-4b6d-b44e-cb40d0e9b302",
+    "name": "Tournament Microservices Gateway",
+    "description": "Gateway requests for the tournament interview task (HTTP -> Kafka -> tournament-service -> NATS -> user-service).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "playerId",
+      "value": "user1"
+    },
+    {
+      "key": "gameType",
+      "value": "chess"
+    },
+    {
+      "key": "tournamentType",
+      "value": "solo"
+    },
+    {
+      "key": "entryFee",
+      "value": "10"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Gateway Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "POST Join Tournament (Success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-correlation-id",
+                "value": "postman-join-1"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"{{playerId}}\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tournaments",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Player Tournaments (Success)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-correlation-id",
+                "value": "postman-query-1"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/players/{{playerId}}/tournaments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "players",
+                "{{playerId}}",
+                "tournaments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Join Tournament (Duplicate -> Conflict)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"{{playerId}}\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tournaments",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Join Tournament (Unknown User -> Not Found)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-correlation-id",
+                "value": "postman-join-missing-user"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"missing-user\",\n  \"gameType\": \"{{gameType}}\",\n  \"tournamentType\": \"{{tournamentType}}\",\n  \"entryFee\": {{entryFee}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tournaments",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Join Tournament (Validation Error -> Bad Request)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"\",\n  \"gameType\": \"chess\",\n  \"tournamentType\": \"solo\",\n  \"entryFee\": -5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tournaments/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tournaments",
+                "join"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
