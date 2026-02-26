@@ -139,6 +139,12 @@ Notes:
 
 You can run infra in Docker and services on your host machine.
 
+### 1. Install dependencies from the base folder
+
+```bash
+npm install
+```
+
 ### 1. Start infra only
 
 ```bash
