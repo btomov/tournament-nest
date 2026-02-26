@@ -1,4 +1,20 @@
 services:
+  showcase-ui:
+    build:
+      context: .
+      dockerfile: apps/showcase-ui/Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:${GATEWAY_PORT:-3000}
+    container_name: tournament-showcase-ui
+    restart: unless-stopped
+    depends_on:
+      gateway:
+        condition: service_started
+    ports:
+      - '${SHOWCASE_UI_PORT:-8080}:80'
+    networks:
+      - tournament_net
+
   gateway:
     build:
       context: .

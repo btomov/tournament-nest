@@ -8,6 +8,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -20,7 +21,6 @@ async function bootstrap(): Promise<void> {
   const port = Number.parseInt(process.env.PORT ?? '3000', 10);
   const safePort = Number.isFinite(port) ? port : 3000;
 
-  // Static OpenAPI keeps controllers/DTOs clean and easy to refactor.
   const openApiPath = join(
     process.cwd(),
     'openapi',
