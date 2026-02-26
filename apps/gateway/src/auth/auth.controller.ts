@@ -1,9 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  type LoginHttpResponse,
-  LoginHttpRequestDto,
-} from './auth.dto';
+import { type LoginHttpResponse, LoginHttpRequestDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,4 +11,3 @@ export class AuthController {
     return this.authService.issueTokenForPlayer(body.playerId);
   }
 }
-

@@ -19,25 +19,28 @@ export class TournamentPersistenceService {
   constructor(
     @InjectRepository(TournamentEntity)
     private readonly tournamentsRepository: Repository<TournamentEntity>,
-    @InjectRepository(TournamentPlayerEntity)
-    private readonly tournamentPlayersRepository: Repository<TournamentPlayerEntity>,
   ) {}
 
   async upsertPlayerIntoTournament(
     criteria: JoinCriteria,
     user: UserProfile,
   ): Promise<UpsertJoinResult> {
-    return this.tournamentsRepository.manager.transaction(
-      async (manager) => this.upsertPlayerInTransaction(manager, criteria, user),
+    return this.tournamentsRepository.manager.transaction(async (manager) =>
+      this.upsertPlayerInTransaction(manager, criteria, user),
     );
   }
 
   async getPlayerTournaments(playerId: string): Promise<TournamentRecord[]> {
     const tournaments = await this.tournamentsRepository
       .createQueryBuilder('tournament')
-      .innerJoin('tournament.players', 'membership', 'membership.playerId = :playerId', {
-        playerId,
-      })
+      .innerJoin(
+        'tournament.players',
+        'membership',
+        'membership.playerId = :playerId',
+        {
+          playerId,
+        },
+      )
       .leftJoinAndSelect('tournament.players', 'players')
       .orderBy('tournament.createdAt', 'ASC')
       .addOrderBy('players.joinedAt', 'ASC')
@@ -58,13 +61,17 @@ export class TournamentPersistenceService {
       .createQueryBuilder('player')
       .innerJoin('player.tournament', 'tournament')
       .where('player.playerId = :playerId', { playerId: user.id })
-      .andWhere('tournament.gameType = :gameType', { gameType: criteria.gameType })
+      .andWhere('tournament.gameType = :gameType', {
+        gameType: criteria.gameType,
+      })
       .andWhere('tournament.tournamentType = :tournamentType', {
         tournamentType: criteria.tournamentType,
       })
-      .andWhere('tournament.entryFee = :entryFee', { entryFee: criteria.entryFee })
+      .andWhere('tournament.entryFee = :entryFee', {
+        entryFee: criteria.entryFee,
+      })
       .select(['player.id'])
-      .getRawOne();
+      .getRawOne<{ id: string }>();
 
     if (existingMembership) {
       return 'already_joined';
@@ -77,13 +84,16 @@ export class TournamentPersistenceService {
       .andWhere('tournament.tournamentType = :tournamentType', {
         tournamentType: criteria.tournamentType,
       })
-      .andWhere('tournament.entryFee = :entryFee', { entryFee: criteria.entryFee })
+      .andWhere('tournament.entryFee = :entryFee', {
+        entryFee: criteria.entryFee,
+      })
       .orderBy('tournament.createdAt', 'ASC')
       .getRawMany<{ id: string }>();
 
     let selectedTournament: TournamentEntity | null = null;
 
     for (const candidate of candidateIds) {
+      // Prevent potential race conditions
       const lockedTournament = await tournamentsRepository
         .createQueryBuilder('tournament')
         .setLock('pessimistic_write')

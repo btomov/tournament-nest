@@ -77,9 +77,7 @@ describe('TournamentUsersClient', () => {
   });
 
   it('maps timeout to DEPENDENCY_TIMEOUT', async () => {
-    client.send.mockReturnValue(
-      throwError(() => new TimeoutError()) as never,
-    );
+    client.send.mockReturnValue(throwError(() => new TimeoutError()) as never);
 
     const result = await service.getUserById('corr-3', 'user1');
 
@@ -106,4 +104,3 @@ describe('TournamentUsersClient', () => {
     });
   });
 });
-

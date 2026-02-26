@@ -37,10 +37,10 @@ export class TournamentUsersClient implements OnModuleInit {
     try {
       const response = await firstValueFrom(
         this.client
-          .send<UserLookupResponse, UserLookupRequest>(
-            NatsPatterns.usersGetById,
-            payload,
-          )
+          .send<
+            UserLookupResponse,
+            UserLookupRequest
+          >(NatsPatterns.usersGetById, payload)
           .pipe(timeout(USER_LOOKUP_TIMEOUT_MS)),
       );
 
@@ -69,7 +69,10 @@ export class TournamentUsersClient implements OnModuleInit {
           error: {
             code: ServiceErrorCodes.dependencyTimeout,
             message: 'User service request timed out',
-            details: { dependency: 'user-service', timeoutMs: USER_LOOKUP_TIMEOUT_MS },
+            details: {
+              dependency: 'user-service',
+              timeoutMs: USER_LOOKUP_TIMEOUT_MS,
+            },
           },
         };
       }

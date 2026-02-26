@@ -87,6 +87,10 @@ describe('TournamentsService', () => {
         }),
       }),
     );
+    expect(response.data.ok).toBe(true);
+    if (!response.data.ok) {
+      throw new Error('Expected a successful service response');
+    }
     expect(result).toEqual(response.data.data);
   });
 
@@ -149,4 +153,3 @@ describe('TournamentsService', () => {
     }
   });
 });
-

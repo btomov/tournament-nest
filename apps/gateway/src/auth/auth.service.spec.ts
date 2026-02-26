@@ -39,4 +39,3 @@ describe('AuthService', () => {
     expect(result.expiresIn).toBe('15m');
   });
 });
-

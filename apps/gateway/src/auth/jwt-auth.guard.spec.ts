@@ -1,7 +1,4 @@
-import {
-  type ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { type ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ServiceErrorCodes } from '@app/contracts';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -102,4 +99,3 @@ describe('JwtAuthGuard', () => {
     }
   });
 });
-

@@ -11,7 +11,9 @@ describe('AuthController', () => {
       }),
     };
 
-    const controller = new AuthController(authService as unknown as AuthService);
+    const controller = new AuthController(
+      authService as unknown as AuthService,
+    );
 
     const result = controller.login({ playerId: 'user1' } as never);
 
@@ -23,4 +25,3 @@ describe('AuthController', () => {
     });
   });
 });
-

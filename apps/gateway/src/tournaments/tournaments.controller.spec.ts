@@ -1,5 +1,6 @@
 import { TournamentsController } from './tournaments.controller';
 import { TournamentsService } from './tournaments.service';
+import { type JoinTournamentResult } from '@app/contracts';
 
 type MockedTournamentsService = Pick<
   jest.Mocked<TournamentsService>,
@@ -27,7 +28,7 @@ describe('TournamentsController', () => {
       tournamentType: 'solo',
       entryFee: 10,
     };
-    const expected = {
+    const expected: JoinTournamentResult = {
       tournament: {
         tournamentId: 't1',
         gameType: 'chess',

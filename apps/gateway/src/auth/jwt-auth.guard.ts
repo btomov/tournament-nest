@@ -18,8 +18,9 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request =
-      context.switchToHttp().getRequest<RequestWithHeadersAndUser>();
+    const request = context
+      .switchToHttp()
+      .getRequest<RequestWithHeadersAndUser>();
     const authHeader = request.headers.authorization;
     const token = this.extractBearerToken(authHeader);
 
@@ -69,4 +70,3 @@ export class JwtAuthGuard implements CanActivate {
     return token.trim();
   }
 }
-

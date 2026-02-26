@@ -1,4 +1,8 @@
-import { type TournamentResponseMessage } from '@app/contracts';
+import {
+  type GetPlayerTournamentsResult,
+  type JoinTournamentResult,
+  type TournamentResponseMessage,
+} from '@app/contracts';
 import { TournamentController } from './tournament.controller';
 import { TournamentService } from './tournament.service';
 import {
@@ -89,7 +93,7 @@ describe('TournamentController', () => {
           },
         },
       },
-    } satisfies TournamentResponseMessage<unknown>;
+    } satisfies TournamentResponseMessage<JoinTournamentResult>;
 
     tournamentService.joinTournament.mockResolvedValue(expectedResponse);
 
@@ -115,13 +119,15 @@ describe('TournamentController', () => {
           tournaments: [],
         },
       },
-    } satisfies TournamentResponseMessage<unknown>;
+    } satisfies TournamentResponseMessage<GetPlayerTournamentsResult>;
 
     tournamentService.getPlayerTournaments.mockResolvedValue(expectedResponse);
 
     const response = await controller.handleGetPlayerTournaments(payload);
 
-    expect(tournamentService.getPlayerTournaments).toHaveBeenCalledWith(payload);
+    expect(tournamentService.getPlayerTournaments).toHaveBeenCalledWith(
+      payload,
+    );
     expect(response).toBe(expectedResponse);
   });
 });

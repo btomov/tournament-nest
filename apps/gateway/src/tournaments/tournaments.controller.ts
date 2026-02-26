@@ -48,7 +48,10 @@ export class TournamentsController {
     @CurrentUser() user: JwtUser,
     @Headers('x-correlation-id') correlationId?: string,
   ): Promise<GetPlayerTournamentsResult> {
-    return this.tournamentsService.getPlayerTournaments(user.sub, correlationId);
+    return this.tournamentsService.getPlayerTournaments(
+      user.sub,
+      correlationId,
+    );
   }
 
   @Get('players/:playerId/tournaments')

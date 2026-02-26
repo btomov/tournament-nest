@@ -112,7 +112,10 @@ describe('TournamentService', () => {
 
     const response = await service.joinTournament(createJoinMessage() as never);
 
-    expect(usersClient.getUserById).toHaveBeenCalledWith('corr-join-1', 'user1');
+    expect(usersClient.getUserById).toHaveBeenCalledWith(
+      'corr-join-1',
+      'user1',
+    );
     expect(persistence.upsertPlayerIntoTournament).toHaveBeenCalledWith(
       {
         gameType: 'chess',
@@ -225,4 +228,3 @@ describe('TournamentService', () => {
     });
   });
 });
-

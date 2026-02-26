@@ -11,4 +11,3 @@ export type LoginHttpResponse = {
   tokenType: 'Bearer';
   expiresIn: string;
 };
-
